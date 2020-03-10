@@ -22,28 +22,28 @@
   background-size: cover;
   color: #000;
 }
-.wrap-art{
+.wrap__art{
   width: 1px;
 }
-.album-art{
+.album__art{
   width: 40px;
   margin-bottom: 8px;
 }
 
-.search-results{
+.search__results{
   height: fit-content;
   margin-left: 30px;
   margin-top: 5px;
   border-bottom: solid 2px rgba(0, 0, 0, .2);
 }
 
-.playlist-search-results{
+.playlist__search--results{
   width: 70%;
   margin-left: 65px;
   margin-bottom: 5px;
   border-bottom: solid 2px rgba(0,0,0,.2);
 }
-.col-sm-11.track-align{
+.col-sm-11.track__align{
   padding-left: 0;
 }
 .track{
@@ -53,13 +53,13 @@
   margin-left: 15px;  
 }
 
-.track.track-title{
+.track__title{
   margin-top: -8px;
   font-weight: 600;
   font-size: 13px;
 }
 
-.track.track-artist{
+.track__artist{
   font-size: 12px;
 }
 
@@ -70,17 +70,17 @@
   margin-left: 15px; 
 }
 
-.current-song.title{
+.current-song__title{
   margin-top: -8px;
   font-weight: 600;
   font-size: 13px;
 }
 
-.current-song.artist{
+.current-song__artist{
   font-size: 12px;
 }
 
-.nicer-button{
+.button__login{
   margin-top: 20px;
   width: 175px;
   border-radius: 25px;
@@ -92,7 +92,7 @@
   color: black;
   outline: none;
 }
-.nicer-button:active, .nicer-button:focus{
+.button__login:active, .button__login:focus{
   outline: none;
 }
 
@@ -107,7 +107,7 @@
   text-align: right;
 }
 
-.add-button{
+.button__add{
   width: 30px;
   height: 30px;
   margin-right: 10%;
@@ -119,11 +119,11 @@
   color: white;
   outline: none;
 }
-.add-button:active, .add-button:focus{
+.button__add:active, .button__add:focus{
   outline: 0;
 }
 
-.add-button:hover{
+.button__add:hover{
   color: rgb(41, 168, 41);
 }
 
@@ -156,7 +156,7 @@
   outline: 0;
   border: solid 1px black;
 }
-.playlist-title{
+.playlist__title{
   text-align: center;
   color: #ddd;
   margin-bottom: 25px;
