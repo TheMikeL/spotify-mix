@@ -9,39 +9,30 @@ const HomePage = () => {
   const [currentSong, setCurrentSong] = useState('');
   const [playList, setPlayList] = useState({});
   const [playListTracks, setPlayListTracks] = useState([]);
+  const [trackRows, setTrackRows] = useState<any[]>([]);
 
   const getCurrentPlaylist = () => {
     const songID = currentSong;
     spotifyWebAPI.getPlaylistTracks('22j362ix734nbwqdoqjnl3rri', '6RxCC9aUbbPzrsbMKO3k7o')
       .then((response: any) => {
-        const results = response.body.items;
-        const playlistTracks: any[] = [];
-        let playlistTrack;
-        let curr;
-        // move loop to actual js file while passing object
-        results.forEach((track: any) => {
-          if (track.track.id === songID) {
-            curr = true;
-            playlistTrack = <PlayListRow isCurrentSong={curr} key={track.track.id} trackObject={track.track} />;
-          } else {
-            curr = false;
-            playlistTrack = <PlayListRow isCurrentSong={curr} key={track.track.id} trackObject={track.track} />;
+        const tracks = response.body.items;
+        const currentPlayList = tracks.map((item: any) => {
+          if (item.track.id === songID) {
+            return <PlayListRow isCurrentSong key={item.track.id} trackObject={item.track} />;
           }
-          playlistTracks.push(playlistTrack);
+          return <PlayListRow isCurrentSong={false} key={item.track.id} trackObject={item.track} />;
         });
-        setPlayListTracks(playListTracks);
+        setPlayListTracks(currentPlayList);
       })
       .catch((error: string) => {
-      // do whatever you want with the error and then...playListName:listName
         throw error;
       });
   };
 
-  const getPlayListName = () => {
+  const getPlayList = () => {
     spotifyWebAPI.getPlaylist('22j362ix734nbwqdoqjnl3rri', '6RxCC9aUbbPzrsbMKO3k7o')
       .then((response:any) => {
         setPlayList(response.body);
-        getCurrentPlaylist();
       }, (err: string) => {
         console.log('Something went wrong!', err);
       });
@@ -56,14 +47,6 @@ const HomePage = () => {
         console.log('Something went wrong!', err);
       });
   };
-
-  useEffect(() => {
-    if (auth.loggedIn) {
-      getPlayListName();
-    }
-    getCurrentSong();
-  }, []);
-
 
   // potential use of e.target.elements.track.URI
   const addSongtoPlaylist = (trackURI:string) => {
@@ -80,16 +63,13 @@ const HomePage = () => {
   const searchSongs = (searchTerm: string) => {
     spotifyWebAPI.search(searchTerm, ['track', 'artist'])
       .then((response: any) => {
-        const results = response.body.tracks.items;
-        const trackRows: any[] = [];
-        results.forEach((track: any) => {
-          const trackRow = <TrackRow key={track.id} trackObject={track} addSong={addSongtoPlaylist} />;
-          trackRows.push(trackRow);
-        });
-        this.setState({ rows: trackRows });
+        const tracks = response.body.tracks.items;
+        const results = tracks.map((track: any) => (
+          <TrackRow key={track.id} track={track} addSong={addSongtoPlaylist} />
+        ));
+        setTrackRows(results);
       })
       .catch((error: string) => {
-      // do whatever you want with the error and then...
         throw error;
       });
   };
@@ -99,7 +79,13 @@ const HomePage = () => {
     searchSongs(searchTerm);
   };
 
-  
+  useEffect(() => {
+    if (auth.loggedIn) {
+      getPlayList();
+      getCurrentPlaylist();
+    }
+    getCurrentSong();
+  }, []);
 
   return (
     <div className="App">
@@ -118,7 +104,7 @@ const HomePage = () => {
           </div>
           <div className="col-sm-4 panel right-panel">
             <input onChange={handleSearchChange} className="search-bar" placeholder="Search..." />
-            {this.state.rows}
+            {trackRows}
           </div>
         </div>
       </div>
