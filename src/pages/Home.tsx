@@ -1,44 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
-import PlayListRow from '../components/PlayListRow';
+import { useDebounce } from 'use-lodash-debounce';
 import TrackRow from '../components/TrackRow';
+import PlayList from '../components/PlayList';
 import AuthContext from '../context/auth-context';
 
 const HomePage = () => {
   const authContext = useContext(AuthContext);
   const { auth, spotifyWebAPI } = authContext;
   const [currentSong, setCurrentSong] = useState('');
-  const [playList, setPlayList] = useState({});
-  const [playListTracks, setPlayListTracks] = useState([]);
   const [trackRows, setTrackRows] = useState<any[]>([]);
 
-  const getCurrentPlaylist = () => {
-    const songID = currentSong;
-    spotifyWebAPI.getPlaylistTracks('22j362ix734nbwqdoqjnl3rri', '6RxCC9aUbbPzrsbMKO3k7o')
-      .then((response: any) => {
-        const tracks = response.body.items;
-        const currentPlayList = tracks.map((item: any) => {
-          if (item.track.id === songID) {
-            return <PlayListRow isCurrentSong key={item.track.id} trackObject={item.track} />;
-          }
-          return <PlayListRow isCurrentSong={false} key={item.track.id} trackObject={item.track} />;
-        });
-        setPlayListTracks(currentPlayList);
-      })
-      .catch((error: string) => {
-        throw error;
-      });
-  };
-
-  const getPlayList = () => {
-    spotifyWebAPI.getPlaylist('22j362ix734nbwqdoqjnl3rri', '6RxCC9aUbbPzrsbMKO3k7o')
-      .then((response:any) => {
-        setPlayList(response.body);
-      }, (err: string) => {
-        console.log('Something went wrong!', err);
-      });
-  };
-
-  const getCurrentSong = () => {
+  const getCurrentTrack = () => {
     spotifyWebAPI.getMyCurrentPlaybackState({
     })
       .then((data: any) => {
@@ -49,7 +21,7 @@ const HomePage = () => {
   };
 
   // potential use of e.target.elements.track.URI
-  const addSongtoPlaylist = (trackURI:string) => {
+  const addTracktoPlaylist = (trackURI:string) => {
     const newTracks = [];
     newTracks.push(trackURI);
     spotifyWebAPI.addTracksToPlaylist('22j362ix734nbwqdoqjnl3rri', '6RxCC9aUbbPzrsbMKO3k7o', newTracks)
@@ -60,12 +32,12 @@ const HomePage = () => {
       });
   };
 
-  const searchSongs = (searchTerm: string) => {
+  const searchTracks = (searchTerm: string) => {
     spotifyWebAPI.search(searchTerm, ['track', 'artist'])
       .then((response: any) => {
         const tracks = response.body.tracks.items;
         const results = tracks.map((track: any) => (
-          <TrackRow key={track.id} track={track} addSong={addSongtoPlaylist} />
+          <TrackRow key={track.id} track={track} addSong={addTracktoPlaylist} />
         ));
         setTrackRows(results);
       })
@@ -75,16 +47,12 @@ const HomePage = () => {
   };
 
   const handleSearchChange = (event: any) => {
-    const searchTerm = event.target.value;
-    searchSongs(searchTerm);
+    const searchTerm = useDebounce(event.target.value, 500);
+    searchTracks(searchTerm);
   };
 
   useEffect(() => {
-    if (auth.loggedIn) {
-      getPlayList();
-      getCurrentPlaylist();
-    }
-    getCurrentSong();
+    getCurrentTrack();
   }, []);
 
   return (
@@ -99,8 +67,7 @@ const HomePage = () => {
         <div className="row">
           <div className="col-sm-2" />
           <div className="col-sm-4 panel left-panel">
-            <h2 className="playlist__title">{playList.name}</h2>
-            <div className="playlist-tracks">{playListTracks}</div>
+            <PlayList currentSong={currentSong} />
           </div>
           <div className="col-sm-4 panel right-panel">
             <input onChange={handleSearchChange} className="search-bar" placeholder="Search..." />
