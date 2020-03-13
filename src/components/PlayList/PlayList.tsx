@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import PlayListRow from '../components/PlayListRow';
-import AuthContext from '../context/auth-context';
+import PlayListRow from './PlayListRow';
+import AuthContext from '../../context/auth-context';
 
 const PlayList = (props: {currentSong: string}) => {
   const { currentSong } = props;
@@ -8,8 +8,6 @@ const PlayList = (props: {currentSong: string}) => {
   const { auth, spotifyWebAPI } = authContext;
   const [playList, setPlayList] = useState({});
   const [playListTracks, setPlayListTracks] = useState([]);
-
-
 
   const getCurrentPlaylist = () => {
     spotifyWebAPI.getPlaylistTracks('22j362ix734nbwqdoqjnl3rri', '6RxCC9aUbbPzrsbMKO3k7o')

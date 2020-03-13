@@ -10,5 +10,11 @@ interface IAuthContext {
 
 export default React.createContext<IAuthContext>({
   auth: { loggedIn: false, accessToken: '' },
-  spotifyWebAPI: {},
+  spotifyWebAPI: {
+    getMyCurrentPlaybackState: () => {},
+    addTracksToPlaylist: () => {},
+    search: () => {},
+    getPlaylistTracks: () => {},
+    getPlaylist: () => {},
+  },
 });

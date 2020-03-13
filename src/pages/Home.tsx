@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useDebounce } from 'use-lodash-debounce';
-import TrackRow from '../components/TrackRow';
-import PlayList from '../components/PlayList';
+import PlayList from '../components/PlayList/PlayList';
 import AuthContext from '../context/auth-context';
+import Tracks from '../components/SpotifyTracks/Tracks';
 
 const HomePage = () => {
   const authContext = useContext(AuthContext);
+  const [currentSong, setCurrentSong] = useState<string>('');
   const { auth, spotifyWebAPI } = authContext;
-  const [currentSong, setCurrentSong] = useState('');
-  const [trackRows, setTrackRows] = useState<any[]>([]);
 
   const getCurrentTrack = () => {
     spotifyWebAPI.getMyCurrentPlaybackState({
@@ -20,41 +18,9 @@ const HomePage = () => {
       });
   };
 
-  // potential use of e.target.elements.track.URI
-  const addTracktoPlaylist = (trackURI:string) => {
-    const newTracks = [];
-    newTracks.push(trackURI);
-    spotifyWebAPI.addTracksToPlaylist('22j362ix734nbwqdoqjnl3rri', '6RxCC9aUbbPzrsbMKO3k7o', newTracks)
-      .then((response: any) => {
-        console.log('Success!', response);
-      }, (err: string) => {
-        console.log('Something went wrong!', err);
-      });
-  };
-
-  const searchTracks = (searchTerm: string) => {
-    spotifyWebAPI.search(searchTerm, ['track', 'artist'])
-      .then((response: any) => {
-        const tracks = response.body.tracks.items;
-        const results = tracks.map((track: any) => (
-          <TrackRow key={track.id} track={track} addSong={addTracktoPlaylist} />
-        ));
-        setTrackRows(results);
-      })
-      .catch((error: string) => {
-        throw error;
-      });
-  };
-
-  const handleSearchChange = (event: any) => {
-    const searchTerm = useDebounce(event.target.value, 500);
-    searchTracks(searchTerm);
-  };
-
   useEffect(() => {
     getCurrentTrack();
   }, []);
-
   return (
     <div className="App">
       <div className="center-login-button">
@@ -70,8 +36,7 @@ const HomePage = () => {
             <PlayList currentSong={currentSong} />
           </div>
           <div className="col-sm-4 panel right-panel">
-            <input onChange={handleSearchChange} className="search-bar" placeholder="Search..." />
-            {trackRows}
+            <Tracks />
           </div>
         </div>
       </div>
